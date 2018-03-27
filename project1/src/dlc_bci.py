@@ -1,4 +1,3 @@
-
 # This is distributed under BSD 3-Clause license
 
 import torch
@@ -8,9 +7,17 @@ import errno
 
 from six.moves import urllib
 
-def tensor_from_file(root, filename,
-                     base_url = 'https://documents.epfl.ch/users/f/fl/fleuret/www/data/bci'):
 
+def tensor_from_file(root, filename,
+                     base_url='https://documents.epfl.ch/users/f/fl/fleuret/www/data/bci'):
+    """
+    Loads a file with a tensor format and returns the corresponding torch.Tensor object. The files are downloaded
+    if they are not in the root folder.
+    :param root: (string) Name of the root directory
+    :param filename: (string) Name of the file to read
+    :param base_url: (string) Url from where the files are downloaded
+    :return: A torch.Tensor object containing the file data
+    """
     file_path = os.path.join(root, filename)
 
     if not os.path.exists(file_path):
@@ -31,21 +38,16 @@ def tensor_from_file(root, filename,
 
     return torch.from_numpy(numpy.loadtxt(file_path))
 
-def load(root, train = True, download = True, one_khz = False):
+
+def load(root, train=True, download=True, one_khz=False):
     """
-    Args:
-
-        root (string): Root directory of dataset.
-
-        train (bool, optional): If True, creates dataset from training data.
-
-        download (bool, optional): If True, downloads the dataset from the internet and
-            puts it in root directory. If dataset is already downloaded, it is not
-            downloaded again.
-
-        one_khz (bool, optional): If True, creates dataset from the 1000Hz data instead
-            of the default 100Hz.
-
+    Helper function to easily load the training or testing set with the right sampling frequency.
+    :param root: (string) Name of the root directory
+    :param train: (boolean) The training or the testing sets are loaded whether it is True or False respectively
+    :param download: If True, downloads the dataset from the internet and puts it in root directory. If dataset is
+                     already downloaded, it is not downloaded again.
+    :param one_khz: The sampling frequency will be 100Hz or 1kHz if it is False or True respectively
+    :return: The training or testing input and target
     """
 
     nb_electrodes = 28

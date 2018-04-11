@@ -2,5 +2,19 @@
 File containing the feature augmentation functions used by the baseline models.
 """
 
-def PolynomialFeatures(data, max_degree=5):
-    raise NotImplementedError
+from sklearn.preprocessing import PolynomialFeatures
+
+
+def augment_polynomial(data, max_degree=5, interaction_only=False):
+    poly = PolynomialFeatures(max_degree, interaction_only=interaction_only)
+    return poly.fit_transform(data)
+
+
+def augment_data(data, feature_augmentation):
+    if feature_augmentation is not None:
+        if isinstance(feature_augmentation, list):
+            for augmentation_function in feature_augmentation:
+                data = augmentation_function(data)
+        else:
+            data = feature_augmentation(data)
+    return data

@@ -1,6 +1,11 @@
+import numpy as np
+
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
+
+from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import GridSearchCV
 
 from mlmodel import MLModel
 
@@ -26,28 +31,24 @@ class BaselineModel(MLModel):
         elif isinstance(model, LogisticRegression) or isinstance(model, SVC) or isinstance(model, RandomForestClassifier):
             self.model = model
         else:
-            raise ValueError('The argument "model is invalid"')
+            raise ValueError('The argument "model" is invalid')
         return self.model
+
+    def update_data(self, data=None, targets=None, feature_augmentation=None):
+        MLModel.update_data(self, data, targets, feature_augmentation)
+
+        if data is not None:
+            self.data = self.data.view(data.shape[0], -1)
+            self.data = self.data.numpy()
 
     def __init__(self, model='logistic', data=None, targets=None, feature_augmentation=None, **kwargs):
         MLModel.__init__(self)
         self.model = self.set_model(model)
-        self.data = data
-        self.targets = targets
-        self.feature_augmentation = feature_augmentation
+        self.update_data(data=data, targets=targets, feature_augmentation=feature_augmentation)
         self.set_params(**kwargs)
 
     def train(self, data=None, targets=None, feature_augmentation=None):
-        if data is not None:
-            self.data = data
-
-        if targets is not None:
-            self.targets = targets
-
-        if feature_augmentation is not None:
-            self.feature_augmentation = feature_augmentation
-
-        self.data = augment_data(self.data, self.feature_augmentation)
+        self.update_data(data=data, targets=targets, feature_augmentation=feature_augmentation)
 
         self.model.fit(self.data, self.targets)
 
@@ -55,3 +56,14 @@ class BaselineModel(MLModel):
         data = augment_data(data, self.feature_augmentation)
 
         return self.model.predict(data)
+
+    def cross_validation(self, data=None, targets=None, feature_augmentation=None, num_folds=5, scoring=None):
+        self.update_data(data=data, targets=targets, feature_augmentation=feature_augmentation)
+        scores = cross_val_score(self.model, self.data, self.targets, cv=num_folds, scoring=scoring)
+        return np.mean(scores), np.std(scores)
+
+    def tune_params(self, params, data=None, targets=None, feature_augmentation=None, num_folds=5, scoring=None):
+        self.update_data(data=data, targets=targets, feature_augmentation=feature_augmentation)
+        clf = GridSearchCV(self.model, params, cv=num_folds, scoring=scoring, return_train_score=True)
+        clf.fit(self.data, self.targets)
+        return clf

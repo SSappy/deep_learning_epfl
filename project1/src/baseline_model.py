@@ -4,6 +4,8 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 
+from sklearn import preprocessing
+
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import GridSearchCV
 
@@ -39,7 +41,8 @@ class BaselineModel(MLModel):
 
         if data is not None:
             self.data = self.data.view(data.shape[0], -1)
-            self.data = self.data.numpy()
+            self.data = self.data.numpy().astype(float)
+            self.data = preprocessing.scale(self.data)
 
     def __init__(self, model='logistic', data=None, targets=None, feature_augmentation=None, **kwargs):
         MLModel.__init__(self)
@@ -49,11 +52,13 @@ class BaselineModel(MLModel):
 
     def train(self, data=None, targets=None, feature_augmentation=None):
         self.update_data(data=data, targets=targets, feature_augmentation=feature_augmentation)
-
         self.model.fit(self.data, self.targets)
 
     def predict(self, data):
         data = augment_data(data, self.feature_augmentation)
+        data = data.view(data.shape[0], -1)
+        data = data.numpy().astype(float)
+        data = preprocessing.scale(data)
 
         return self.model.predict(data)
 

@@ -1,6 +1,6 @@
-from torch import FloatTensor, LongTensor, matmul
+from torch import FloatTensor, LongTensor, matmul, transpose
 from module import Module
-from numpy.random import normal
+from numpy.random import uniform
 
 
 class Linear(Module):
@@ -17,8 +17,8 @@ class Linear(Module):
         self.input = FloatTensor(input_size)
         self.output = FloatTensor(hidden_units)
 
-        self.weights = FloatTensor(normal(0, 1, size=(hidden_units, input_size)))
-        self.biases = FloatTensor(normal(0, 1, size=hidden_units))
+        self.weights = FloatTensor(uniform(-1, 1, size=(hidden_units, input_size)))
+        self.biases = FloatTensor(uniform(-1, 1, size=hidden_units))
 
         self.weights_gradients = FloatTensor(hidden_units, input_size)
         self.biases_gradients = FloatTensor(hidden_units)
@@ -41,13 +41,15 @@ class Linear(Module):
         :return:
         """
 
-        grad = grad_wrt_output.resize_(grad_wrt_output.size()[0], 1).expand(grad_wrt_output.size()[0], self.input_size)
-        assert list(grad.size()) == [self.hidden_size, self.input_size]
+        # grad = grad_wrt_output.resize_(grad_wrt_output.size()[0], 1).expand(grad_wrt_output.size()[0], self.input_size)
+        # assert list(grad.size()) == [self.hidden_size, self.input_size]
 
-        self.weights_gradients = grad * self.input
+        # self.weights_gradients = grad * self.input
         self.biases_gradients = grad_wrt_output
+        x_transpose = self.input.clone().resize_(1, self.input.size()[0])
+        self.weights_gradients = matmul(grad_wrt_output.resize_(grad_wrt_output.size()[0], 1), x_transpose)
 
-        grad_wrt_input = matmul(self.weights.transpose(0, 1),grad_wrt_output)
+        grad_wrt_input = matmul(self.weights.transpose(0, 1), grad_wrt_output)
 
         self.weights -= step_size * self.weights_gradients
         self.biases -= step_size * self.biases_gradients

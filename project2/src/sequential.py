@@ -1,68 +1,98 @@
-from torch import FloatTensor, cat
-from numpy import mean as npmean
+from numpy.random import shuffle
+from numpy import ndarray
 
 class Sequential:
-    def __init__(self, loss, input_size):
+    def __init__(self, loss, input_size, output_size):
         self.loss = loss
         self.input_size = input_size
+        self.output_size = output_size
         self.layers = []
 
-    def add(self, layer):
-        if self.check_consistency(layer):
-            self.layers.append(layer)
-        else:
-            # raise error
-            print('error of shape')
-
-
-    def fit(self, x_train, y_train, epochs=100, mini_batch_size=1):
-        assert x_train.shape[1] == self.input_size
-
-        num_batch = len(x_train) // mini_batch_size
-
-
-        for epoch in range(1, epochs+1):
-            errors = []
-            predictions = FloatTensor()
-            for k in range(num_batch-1): # TODO take the last samples if batch size not divider of number of samples
-                current_batch = x_train[k*mini_batch_size : (k+1)*mini_batch_size]
-                pred = FloatTensor()
-
-                # forward pass
-                for i in range(current_batch.shape[0]):
-                    current = current_batch[i]
-
-                    # go through all the layers
-                    for layer in self.layers:
-                        current = layer.forward(current)
-
-                    # store the output
-                    pred = cat([pred, current.expand(1, current.shape[0])])
-
-                predictions = cat([predictions, pred])
-                # backward pass
-                mse = self.loss.compute_loss(pred, y_train[k*mini_batch_size : (k+1)*mini_batch_size])
-
-                grad_wrt_output = self.loss.compute_grad(pred, y_train[k*mini_batch_size : (k+1)*mini_batch_size])
-                for i in range(current_batch.shape[0]):
-                    current_grad = grad_wrt_output[i]
-                    for layer in reversed(self.layers):
-                        current_grad = layer.backward(current_grad, step_size=0.001)
-
-                errors.append(npmean(mse))
-
-            print('Training MSE at epoch {} : {}'.format(epoch, npmean(errors)))
-
-        return predictions
-
-
-    def predict(self):
-        pass
-
     def check_consistency(self, layer):
+        """
+
+        :param layer:
+        :return:
+        """
         if len(self.layers) == 0 and layer.get_input_size() == self.input_size:
             return True
         elif len(self.layers) > 0:
             if self.layers[-1].get_hidden_size() == layer.get_input_size():
                 return True
-        return False
+        else:
+            print('Mismatch in the shapes.')
+            print('Trying to append layer of size [{}] to layer of size [{}]').format(layer.get_input_size(),
+                                                                                      self.layers[-1].get_hidden_size())
+            return False
+
+    def add(self, layer):
+        if self.check_consistency(layer):
+            self.layers.append(layer)
+
+    def forward(self, model_input):
+        for layer in self.layers:
+            model_input = layer.forward(model_input)
+        return model_input
+
+    def backward(self, grad_wrt_output, step_size):
+        for layer in reversed(self.layers):
+            grad_wrt_output = layer.backward(grad_wrt_output, step_size=step_size)
+
+
+    def fit(self, x_train, y_train, x_validation, y_validation, epochs=100, step_size=0.0001):
+        """
+
+        :param x_train:
+        :param y_train:
+        :param x_validation:
+        :param y_validation:
+        :param epochs:
+        :param step_size:
+        :return:
+        """
+        try:
+            assert x_train.shape[1] == self.input_size
+        except AssertionError:
+            print('Wrong input shape, samples should have shape [{}] but received [{}]'.format(self.input_size,
+                                                                                               x_train.shape[1]))
+            return
+
+        for epoch in range(1, epochs+1):
+            # shuffle indexes in order for GD to look at samples in random order
+            idx = list(range(x_train.shape[0]))
+            shuffle(idx)
+
+            for i in idx:
+                # forward-pass
+                output = self.forward(x_train[i])
+
+                # backward-pass
+                grad_wrt_output = self.loss.compute_grad(output, y_train[i])
+                self.backward(grad_wrt_output, step_size=step_size)
+
+        # Compute and print validation performance
+        predictions, validation_loss = self.predict(x_validation, y_validation)
+        print('Validation loss : {}'.format(validation_loss))
+        print('Validation accuracy : {}'.format((predictions == y_validation).sum()/predictions.shape[0]))
+
+
+    def predict(self, x, y=None):
+        """
+
+        :param x:
+        :param y:
+        :return:
+        """
+        predictions = ndarray(shape=(x.shape[0], self.output_size))
+
+        for i in range(x.shape[0]):
+            predictions[i] = self.forward(x[i])
+        loss = self.loss.compute_loss(predictions, y)
+
+        predictions[predictions.squeeze() > 0.5] = 1
+        predictions[predictions.squeeze() <= 0.5] = 0
+
+        if y is not None:
+            return predictions, loss
+        else:
+            return predictions

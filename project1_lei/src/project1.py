@@ -57,23 +57,23 @@ from sklearn.model_selection import train_test_split
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        nb_hidden = 32
+        nb_hidden = 16
         self.conv1 = nn.Conv1d(28, 32, kernel_size=5,padding=2)
-        #self.batch_nom1= nn.BatchNorm1d(32)
+        self.batch_nom1= nn.BatchNorm1d(32)
         self.conv2 = nn.Conv1d(32, 32, kernel_size=3,padding=1)
         self.batch_nom2 = nn.BatchNorm1d(32)
         self.conv3 = nn.Conv1d(32, 32, kernel_size=3,padding=1)
-        self.conv3_drop = nn.Dropout()
+        #self.conv3_drop = nn.Dropout()
         self.batch_nom3 = nn.BatchNorm1d(32)
         self.fc1 = nn.Linear(12 * 32, nb_hidden)
         self.fc2 = nn.Linear(nb_hidden, 2)
 
     def forward(self, x):
-        x = F.relu(F.max_pool1d(self.conv1(x), kernel_size=2))
+        x = F.relu(self.batch_nom2(F.max_pool1d(self.conv1(x), kernel_size=2)))
         x = F.relu(self.batch_nom2(F.max_pool1d(self.conv2(x), kernel_size=2)))
-        x = F.relu(self.batch_nom3(self.conv3_drop(self.conv3(x))))
+        x = F.relu(self.batch_nom3(self.conv3(x)))
         x = F.relu(self.fc1(x.view(-1, 12*32)))
-        #x = F.dropout(x,training=self.training)
+        x = F.dropout(x,training=self.training)
         x = self.fc2(x)
         return x
 
@@ -180,9 +180,9 @@ print(str(type(train_target)), train_target.size())
 
 
 # train_input = data_augmentation(train_input,"stretch")
-#train_input = data_augmentation(train_input,"roll")
+# train_input = data_augmentation(train_input,"noise")
 # train_target = torch.cat([train_target,train_target],0)
-#train_target = torch.cat([train_target,train_target],0)
+# train_target = torch.cat([train_target,train_target],0)
 mean,std = torch.mean(train_input,0),torch.std(train_input,0)
 train_input.sub_(mean).div_(std)
 #train_input = preprocessing(train_input)
@@ -209,5 +209,8 @@ plt.plot(Loss)
 plt.show()
 error = compute_nb_error(model,train_input,train_target,79)
 print(100*(1-error/train_target.shape[0]))
-error = compute_nb_error(model,test_input,test_target,20)
+error = 0
+for i in range(500):
+    error += compute_nb_error(model,test_input,test_target,20)
+error = error/500
 print(100*(1-error/test_target.shape[0]))

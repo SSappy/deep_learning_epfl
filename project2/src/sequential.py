@@ -1,6 +1,7 @@
 from numpy.random import shuffle
 from numpy import ndarray, mean
 import numpy as np
+from tqdm import tqdm
 
 class Sequential:
     def __init__(self, loss, input_size):
@@ -76,7 +77,7 @@ class Sequential:
                                                                                                x_train.shape[1]))
             return
 
-        for epoch in range(1, epochs+1):
+        for epoch in tqdm(range(1, epochs+1)):
             # shuffle indexes in order for GD to look at samples in random order
             idx = list(range(x_train.shape[0]))
             shuffle(idx)

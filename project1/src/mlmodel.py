@@ -1,4 +1,4 @@
-from feature_augmentation_helper import augment_data
+from feature_augmentation_helper import augment_features
 
 
 class MLModel():
@@ -13,7 +13,8 @@ class MLModel():
 
         if data is not None:
             self.data = data
-            self.data = augment_data(self.data, self.feature_augmentation)
+            self.data = self.data.view(data.shape[0], -1)
+            self.data = augment_features(self.data, self.feature_augmentation)
 
     def __init__(self):
         self.targets = None

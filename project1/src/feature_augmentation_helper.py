@@ -16,7 +16,7 @@ def augment_polynomial(data, max_degree=5, interaction_only=False):
     return poly.fit_transform(data)
 
 
-def augment_data(data, feature_augmentation):
+def augment_features(data, feature_augmentation):
     """
     :param data:
     :param feature_augmentation:

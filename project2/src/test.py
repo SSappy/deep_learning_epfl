@@ -26,9 +26,20 @@ def build_and_train_model(n=1000, epochs=100, step_size=0.001):
     model.fit(x_train, y_train, x_validation, y_validation, epochs=epochs, step_size=step_size)
 
 if __name__ == '__main__':
-    import warnings
+    try:
+        import torch
+        assert torch.__version__ == '0.3.1'
+        import warnings
 
-    warnings.filterwarnings("ignore",
-                            message="other is not broadcastable to self, but they have the same number of elements.  "
-                                    "Falling back to deprecated pointwise behavior.")
-    build_and_train_model()
+        warnings.filterwarnings("ignore",
+                                message="other is not broadcastable to self, but they have the same number of elements.  "
+                                        "Falling back to deprecated pointwise behavior.")
+        build_and_train_model()
+    except AssertionError:
+        print('Beware that the code was developed under torch 0.3.1.')
+        print('You are currently running torch {}'.format(torch.__version__))
+        if torch.__version__ == '0.4.0':
+            print('You should downgrade to O.3.1 before using.')
+        else:
+            print('Make sur to upgrade to 0.3.1 before using.')
+    

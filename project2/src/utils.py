@@ -1,9 +1,6 @@
 import math
 
-from torch import FloatTensor
-from numpy.linalg import norm
-from numpy.random import rand
-from numpy import ndarray
+from torch import FloatTensor, LongTensor
 
 def build_data(n):
     """
@@ -13,10 +10,10 @@ def build_data(n):
     :param n: number of points to sample
     :return: pair of tensors as described above.
     """
-    coordinates = FloatTensor(rand(n, 2))
-    test = norm((coordinates - FloatTensor([0.5, 0.5])), axis=1) < 1 / math.sqrt(2 * math.pi)
-    labels = ndarray((n, 2))
-    labels[test] = [0, 1]
-    labels[~test] = [1, 0]
-    labels = FloatTensor(labels)
+    # generate points uniformly at random in [0,1]^2
+    coordinates = FloatTensor(n, 2).uniform_(0, 1)
+    # create labels (shape (n,)
+    labels = ((coordinates - FloatTensor([0.5, 0.5])).norm(p=2, dim=1) < 1 / math.sqrt(2 * math.pi)).type(LongTensor)
+    # expand labels to one-hot encoding (shape (n,2)
+    labels = FloatTensor(n, 2).zero_().scatter_(1, labels.view(-1, 1), 1)
     return coordinates, labels

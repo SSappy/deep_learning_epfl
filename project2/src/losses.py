@@ -1,4 +1,3 @@
-from numpy import mean
 from torch import FloatTensor
 
 class MSE:
@@ -16,7 +15,7 @@ class MSE:
         assert predictions.shape == targets.shape
         # make sure we have a torch Tensor
         pred = FloatTensor(predictions)
-        return mean(((targets-pred)**2).numpy(), axis=1)
+        return ((targets-pred)**2).mean(dim=1)
 
     @staticmethod
     def compute_grad(predictions, targets):

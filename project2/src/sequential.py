@@ -1,7 +1,6 @@
-from numpy.random import shuffle
-from numpy import ndarray, mean
-import numpy as np
-from tqdm import tqdm
+from torch import FloatTensor
+
+from random import shuffle
 
 class Sequential:
     def __init__(self, loss, input_size):
@@ -77,7 +76,7 @@ class Sequential:
                                                                                                x_train.shape[1]))
             return
 
-        for epoch in tqdm(range(1, epochs+1)):
+        for epoch in range(1, epochs+1):
             # shuffle indexes in order for GD to look at samples in random order
             idx = list(range(x_train.shape[0]))
             shuffle(idx)
@@ -90,16 +89,19 @@ class Sequential:
                 grad_wrt_output = self.loss.compute_grad(output, y_train[i])
                 self.backward(grad_wrt_output, step_size=step_size)
 
+            _, loss = self.predict(x_train, y_train)
+            print('Loss at epoch {} : {}'.format(epoch, loss.mean()))
+
         # Compute and print training performance
         training_predictions, training_loss = self.predict(x_train, y_train)
         training_accuracy = (training_predictions == y_train).sum() / y_train.shape[1] / training_predictions.shape[0]
-        print('Training loss : {}'.format(mean(training_loss)))
+        print('\nTraining loss : {}'.format(training_loss.mean()))
         print('Training accuracy : {}\n'.format(training_accuracy))
 
         # Compute and print validation performance
         validation_predictions, validation_loss = self.predict(x_validation, y_validation)
         validation_accuracy = (validation_predictions == y_validation).sum() / y_validation.shape[1] / validation_predictions.shape[0]
-        print('Validation loss : {}'.format(mean(validation_loss)))
+        print('Validation loss : {}'.format(validation_loss.mean()))
         print('Validation accuracy : {}'.format(validation_accuracy))
 
         return training_accuracy, validation_accuracy
@@ -113,18 +115,25 @@ class Sequential:
         :return: predictions (and loss if called within fit method)
         """
         output_size = self.layers[-1].get_hidden_size()
-        predictions = ndarray(shape=(x.shape[0], output_size))
+        predictions = FloatTensor(x.shape[0], output_size).zero_()
 
         for i in range(x.shape[0]):
             predictions[i] = self.forward(x[i])
 
         if y is not None:
             loss = self.loss.compute_loss(predictions, y)
-            predictions[np.argmax(predictions, axis=1) == 1] = [0, 1]
-            predictions[np.argmax(predictions, axis=1) == 0] = [1, 0]
+            _, ind = predictions.max(1)
+            predictions = FloatTensor(predictions.shape).zero_().scatter_(1, ind.view(-1, 1), 1)
             return predictions, loss
 
         else:
-            predictions[np.argmax(predictions, axis=1) == 1] = [0, 1]
-            predictions[np.argmax(predictions, axis=1) == 0] = [1, 0]
+            _, ind = predictions.max(1)
+            predictions = FloatTensor(predictions.shape).zero_().scatter_(1, ind.view(-1, 1), 1)
             return predictions
+
+    def summary(self):
+        print('Model with {} layers'.format(len(self.layers)))
+        print('\tInput size : {}'.format(self.input_size))
+        for layer in self.layers[:-1]:
+            layer.summary()
+        print('\t{} fully connected output units'.format(self.layers[-1].get_hidden_size()))

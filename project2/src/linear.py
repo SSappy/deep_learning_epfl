@@ -1,5 +1,4 @@
 from torch import FloatTensor, matmul
-from numpy.random import uniform
 
 from module import Module
 
@@ -17,8 +16,8 @@ class Linear(Module):
         self.input = FloatTensor(input_size)
         self.output = FloatTensor(hidden_units)
 
-        self.weights = FloatTensor(uniform(-1, 1, size=(hidden_units, input_size)))
-        self.biases = FloatTensor(uniform(-1, 1, size=hidden_units))
+        self.weights = FloatTensor(hidden_units, input_size).uniform_(-1, 1)
+        self.biases = FloatTensor(hidden_units).uniform_(-1, 1)
 
         self.weights_gradients = FloatTensor(hidden_units, input_size)
         self.biases_gradients = FloatTensor(hidden_units)
@@ -75,3 +74,6 @@ class Linear(Module):
         :return: input size of the network
         """
         return self.input_size
+
+    def summary(self):
+        print('\tFully connected layer of {} hidden units'.format(self.hidden_size))

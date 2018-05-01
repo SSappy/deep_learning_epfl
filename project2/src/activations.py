@@ -1,5 +1,5 @@
 from torch import FloatTensor, mul
-from numpy import tanh as nptanh
+from math import tanh
 
 from module import Module
 
@@ -58,6 +58,9 @@ class ReLU(Module):
         """
         return self.hidden_size
 
+    def summary(self):
+        print('\tReLU activation layer of size {}'.format(self.hidden_size))
+
 
 class Tanh(Module):
 
@@ -74,7 +77,7 @@ class Tanh(Module):
         :return: tensor of shape (self.size) which is the result of applying element_wise
         tanh function to the input_tensor
         """
-        self.output = nptanh(input_tensor)
+        self.output = input_tensor.apply_(tanh)
         return self.output
 
     def backward(self, grad_wrt_output, step_size=None):
@@ -98,3 +101,6 @@ class Tanh(Module):
 
     def get_input_size(self):
         return self.hidden_size
+
+    def summary(self):
+        print('\tTanh activation layer of size {}'.format(self.hidden_size))

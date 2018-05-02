@@ -36,11 +36,12 @@ if __name__ == '__main__':
                                 message="other is not broadcastable to self, but they have the same number of elements.  "
                                         "Falling back to deprecated pointwise behavior.")
         build_and_train_model()
+
     except AssertionError:
         print('Beware that the code was developed under torch 0.3.1.')
         print('You are currently running torch {}'.format(torch.__version__))
         if torch.__version__ == '0.4.0':
             print('You should downgrade to O.3.1 before using.')
         else:
-            print('Make sur to upgrade to 0.3.1 before using.')
+            print('Make sure to upgrade to 0.3.1 before using.')
     

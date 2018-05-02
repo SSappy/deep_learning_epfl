@@ -3,21 +3,16 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch import optim
-from torch.nn import functional as F
 
 from mlmodel import MLModel
 
 from bci_dataset import BCIDataSet
-from data_augmentation_helper import augment_data
-
-from sklearn.preprocessing import MinMaxScaler
 
 from torchvision import transforms
 
 from preprocessing import Normalize
 from data_augmentation_helper import GaussianNoise
 from data_augmentation_helper import Crop1d
-from data_augmentation_helper import Resize
 
 
 class NNModel(MLModel, nn.Module):
@@ -26,12 +21,9 @@ class NNModel(MLModel, nn.Module):
         MLModel.update_data(self, data, targets, feature_augmentation)
 
         if data is not None:
-            self.data = self.data.view(self.data.shape[0], 1, self.data.shape[1])
-
             self.normalizer = Normalize(torch.min(self.data), torch.max(self.data))
-            self.train_transform = transforms.Compose([GaussianNoise(0, 1),
-                                                       # Crop1d(),
-                                                       # Resize(self.data.shape[2]),
+            self.train_transform = transforms.Compose([Crop1d(),
+                                                       GaussianNoise(0, 2),
                                                        self.normalizer])
             self.test_transform = transforms.Compose([self.normalizer])
             self.data_set = BCIDataSet(self.data, targets, transform=self.train_transform)
@@ -39,8 +31,6 @@ class NNModel(MLModel, nn.Module):
     def __init__(self, data=None, targets=None, feature_augmentation=None):
         MLModel.__init__(self)
         nn.Module.__init__(self)
-        self.data_var = None
-        self.targets_var = None
         self.normalizer = None
         self.train_transform = None
         self.test_transform = None
@@ -103,7 +93,7 @@ class NNModel(MLModel, nn.Module):
 
     def predict(self, data, raw=False):
         self.eval()
-        data = data.view(data.shape[0], 1, -1)
+        # data = data.view(data.shape[0], 1, -1)
         data = self.test_transform(data)
         outputs = self(data)
         if not raw:

@@ -35,7 +35,13 @@ class Crop1d(object):
     def __call__(self, data):
         begin = randint(self.begin)
         end = randint(self.end)
-        return data[begin:-end]
+        if data[0, 0] == 0:
+            print('problem')
+        if begin != 0:
+            data[:, :begin] = 0
+        if end != 0:
+            data[:, -end:] = 0
+        return data
 
 
 class Resize(object):

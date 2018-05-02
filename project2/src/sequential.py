@@ -83,16 +83,16 @@ class Sequential:
             # shuffle indexes in order for GD to look at samples in random order
             idx = list(range(x_train.shape[0]))
             shuffle(idx)
-            print(step_size)
 
             for i in idx:
-                # forward-pass
+                # Forward-pass
                 output = self.forward(x_train[i])
 
-                # backward-pass
+                # Backward-pass
                 grad_wrt_output = self.loss.compute_grad(output, y_train[i])
                 self.backward(grad_wrt_output, step_size=step_size)
 
+                # Gradient step
                 self.gradient_step(step_size)
 
             step_size = step_size * 0.9

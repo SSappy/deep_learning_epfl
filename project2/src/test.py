@@ -15,7 +15,8 @@ def build_model():
     model.add_layer(Linear(25, 2))
     return model
 
-def build_and_train_model(n=1000, epochs=100, step_size=0.001):
+
+def build_and_train_model(n=1000, epochs=50, step_size=0.01):
     print('\nGenerating training and validation sets of size {} each.'.format(n))
     x_train, y_train = build_data(n)
     x_validation, y_validation = build_data(n)

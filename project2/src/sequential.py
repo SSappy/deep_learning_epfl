@@ -55,10 +55,13 @@ class Sequential:
         :param step_size: step size for the weights and bias updates
         """
         for layer in reversed(self.layers):
-            grad_wrt_output = layer.backward(grad_wrt_output, step_size=step_size)
+            grad_wrt_output = layer.backward(grad_wrt_output)
 
+    def gradient_step(self, step_size):
+        for layer in self.layers:
+            layer.gradient_step(step_size)
 
-    def fit(self, x_train, y_train, x_validation, y_validation, epochs=100, step_size=0.0001):
+    def fit(self, x_train, y_train, x_validation, y_validation, epochs=100, step_size=0.1):
         """
         Fit the network.
         :param x_train: training samples (Tensor of shape (num_samples, self.input_size))
@@ -80,6 +83,7 @@ class Sequential:
             # shuffle indexes in order for GD to look at samples in random order
             idx = list(range(x_train.shape[0]))
             shuffle(idx)
+            print(step_size)
 
             for i in idx:
                 # forward-pass
@@ -88,6 +92,10 @@ class Sequential:
                 # backward-pass
                 grad_wrt_output = self.loss.compute_grad(output, y_train[i])
                 self.backward(grad_wrt_output, step_size=step_size)
+
+                self.gradient_step(step_size)
+
+            step_size = step_size * 0.9
 
             _, loss = self.predict(x_train, y_train)
             print('Loss at epoch {} : {}'.format(epoch, loss.mean()))

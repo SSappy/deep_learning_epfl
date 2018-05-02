@@ -1,4 +1,4 @@
-from torch import FloatTensor, mul
+from torch import FloatTensor
 from math import tanh
 
 from module import Module
@@ -39,6 +39,9 @@ class ReLU(Module):
         derivative[derivative != 0] = 1
         self.grad_wrt_input = grad_wrt_output * derivative
         return self.grad_wrt_input
+
+    def gradient_step(self, step_size=None):
+        pass
 
     def param(self):
         """
@@ -89,9 +92,12 @@ class Tanh(Module):
         :return: gradient with respect to input : tensor of shape (self.size) which is the element-wise product of
         gradient of tanh and grad_wrt_output.
         """
-        derivative = 1 - mul(self.output, self.output)
+        derivative = 1 - self.output * self.output
         self.grad_wrt_input = grad_wrt_output * derivative
         return self.grad_wrt_input
+
+    def gradient_step(self, step_size=None):
+        pass
 
     def param(self):
         return []

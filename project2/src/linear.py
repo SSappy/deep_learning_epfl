@@ -1,4 +1,4 @@
-from torch import FloatTensor, matmul
+from torch import FloatTensor
 
 from module import Module
 
@@ -16,8 +16,8 @@ class Linear(Module):
         self.input = FloatTensor(input_size)
         self.output = FloatTensor(hidden_units)
 
-        self.weights = FloatTensor(hidden_units, input_size).uniform_(-1, 1)
-        self.biases = FloatTensor(hidden_units).uniform_(-1, 1)
+        self.weights = FloatTensor(hidden_units, input_size).uniform_(-1, 1) #normal_(0, 2/(input_size + hidden_units))
+        self.biases = FloatTensor(hidden_units).uniform_(-1, 1) #.normal_(0, 2/(input_size + hidden_units))
 
         self.weights_gradients = FloatTensor(hidden_units, input_size)
         self.biases_gradients = FloatTensor(hidden_units)
@@ -30,31 +30,33 @@ class Linear(Module):
         :return: output_tensor of shape (self.hidden_size) which is the result of WX + b
         """
         self.input = input_tensor
-        self.output = matmul(self.weights, input_tensor) + self.biases
+        self.output = self.weights @ input_tensor + self.biases
         return self.output
 
-    def backward(self, grad_wrt_output, step_size=0.1):
+    def backward(self, grad_wrt_output):
         """
-        Backward pass, including weights and biases updates.
+        Backward pass (computation of all the gradients)
         Gradients are computed using the gradient with respect to the output of the layer
         :param grad_wrt_output: gradient with respect to the output
-        :param step_size: step size of the updates
         :return: gradient with respect to the input (to be passed up the network)
         """
-        # computing gradients
-        self.biases_gradients = grad_wrt_output
-        x_transpose = self.input.clone().resize_(1, self.input.size()[0])
-        self.weights_gradients = matmul(grad_wrt_output.resize_(grad_wrt_output.size()[0], 1), x_transpose)
-
         # computing gradient with respect to input
-        grad_wrt_input = matmul(self.weights.transpose(0, 1), grad_wrt_output)
+        grad_wrt_input = self.weights.transpose(0, 1) @ grad_wrt_output
 
-        # updating weights and biases
-        self.weights -= step_size * self.weights_gradients
-        self.biases -= step_size * self.biases_gradients
+        # Compute the derivatives of the loss wrt the parameters
+        self.biases_gradients = grad_wrt_output
+        self.weights_gradients = grad_wrt_output.view(-1, 1) @ self.input.view(1, -1)
 
         return grad_wrt_input
 
+    def gradient_step(self, step_size):
+        """
+        Performs the weights and biases updates
+        :param step_size: step size of the updates
+        """
+        # updating weights and biases
+        self.weights -= step_size * self.weights_gradients
+        self.biases -= step_size * self.biases_gradients
 
     def param(self):
         """

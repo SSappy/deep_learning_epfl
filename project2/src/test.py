@@ -29,7 +29,7 @@ def build_and_train_model(n=1000, epochs=50, step_size=0.01):
 if __name__ == '__main__':
     try:
         import torch
-        assert torch.__version__ == '0.3.1'
+        assert torch.__version__[:5] == '0.3.1'
         import warnings
 
         warnings.filterwarnings("ignore",

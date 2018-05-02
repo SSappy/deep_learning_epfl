@@ -48,16 +48,19 @@ class Sequential:
             model_input = layer.forward(model_input)
         return model_input
 
-    def backward(self, grad_wrt_output, step_size):
+    def backward(self, grad_wrt_output):
         """
-        Proceed to a backward pass on the network (and weight updates)
+        Proceed to a backward pass on the network (computation of the gradients)
         :param grad_wrt_output: gradient with respect to the output
-        :param step_size: step size for the weights and bias updates
         """
         for layer in reversed(self.layers):
             grad_wrt_output = layer.backward(grad_wrt_output)
 
     def gradient_step(self, step_size):
+        """
+        Proceed to a gradient step on the network (update of the weights and biases computed during the backward pass).
+        :param step_size: step size for the weights and bias updates
+        """
         for layer in self.layers:
             layer.gradient_step(step_size)
 
@@ -90,7 +93,7 @@ class Sequential:
 
                 # Backward-pass
                 grad_wrt_output = self.loss.compute_grad(output, y_train[i])
-                self.backward(grad_wrt_output, step_size=step_size)
+                self.backward(grad_wrt_output)
 
                 # Gradient step
                 self.gradient_step(step_size)

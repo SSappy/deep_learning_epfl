@@ -1,7 +1,7 @@
 from feature_augmentation_helper import augment_features
 
 
-class MLModel():
+class MLModel(object):
 
     def update_data(self, data=None, targets=None, feature_augmentation=None):
         if targets is not None:
@@ -13,7 +13,6 @@ class MLModel():
 
         if data is not None:
             self.data = data
-            self.data = self.data.view(data.shape[0], -1)
             self.data = augment_features(self.data, self.feature_augmentation)
 
     def __init__(self):

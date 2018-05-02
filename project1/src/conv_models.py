@@ -6,7 +6,7 @@ from nnmodel import NNModel
 
 class Net(NNModel):
 
-    """def __init__(self):
+    def __init__(self):
         super(Net, self).__init__()
         nb_hidden = 32
         self.conv1 = nn.Conv1d(28, 32, kernel_size=5, padding=2)
@@ -26,9 +26,9 @@ class Net(NNModel):
         x = F.relu(self.fc1(x.view(-1, 12*32)))
         # x = F.dropout(x,training=self.training)
         x = self.fc2(x)
-        return x"""
+        return x
 
-    def __init__(self):
+    """def __init__(self):
         super(Net, self).__init__()
         nb_hidden = 32
         self.conv1 = nn.Conv1d(1, 32, kernel_size=5, padding=2)
@@ -48,7 +48,7 @@ class Net(NNModel):
         x = F.relu(self.fc1(x.view(-1, 350 * 32)))
         # x = F.dropout(x,training=self.training)
         x = self.fc2(x)
-        return x
+        return x"""
 
 
 class TestNet(NNModel):

@@ -16,8 +16,8 @@ class Linear(Module):
         self.input = FloatTensor(input_size)
         self.output = FloatTensor(hidden_units)
 
-        self.weights = FloatTensor(hidden_units, input_size).uniform_(-1, 1) #normal_(0, 2/(input_size + hidden_units))
-        self.biases = FloatTensor(hidden_units).uniform_(-1, 1) #.normal_(0, 2/(input_size + hidden_units))
+        self.weights = FloatTensor(hidden_units, input_size).uniform_(-1, 1)
+        self.biases = FloatTensor(hidden_units).uniform_(-1, 1)
 
         self.weights_gradients = FloatTensor(hidden_units, input_size)
         self.biases_gradients = FloatTensor(hidden_units)

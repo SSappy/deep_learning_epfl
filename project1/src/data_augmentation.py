@@ -28,20 +28,12 @@ class Crop1d(object):
     Add a gaussian noise to the data.
     """
 
-    def __init__(self, begin=10, end=10):
-        self.begin = begin
-        self.end = end
+    def __init__(self, size=42):
+        self.size = size
 
     def __call__(self, data):
-        begin = randint(self.begin)
-        end = randint(self.end)
-        if data[0, 0] == 0:
-            print('problem')
-        if begin != 0:
-            data[:, :begin] = 0
-        if end != 0:
-            data[:, -end:] = 0
-        return data
+        begin = randint(0, data.shape[1] - self.size)
+        return data[:, begin:(begin + self.size)]
 
 
 class Resize(object):

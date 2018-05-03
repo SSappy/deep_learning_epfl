@@ -1,4 +1,4 @@
-from feature_augmentation_helper import augment_features
+from feature_augmentation import augment_features
 
 
 class MLModel(object):

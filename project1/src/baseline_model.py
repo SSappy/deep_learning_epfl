@@ -11,7 +11,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import GridSearchCV
 
-from feature_augmentation_helper import augment_features
+from feature_augmentation import augment_features
 
 from mlmodel import MLModel
 

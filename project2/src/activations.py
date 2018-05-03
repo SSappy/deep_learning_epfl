@@ -41,11 +41,14 @@ class ReLU(Module):
         return self.grad_wrt_input
 
     def gradient_step(self, step_size=None):
+        """
+        Present for consistency with linear layers.
+        """
         pass
 
     def param(self):
         """
-        :return: list of parameters of the current layer (empty here).
+        :return: empty list as layer has no parameter
         """
         return []
 
@@ -97,12 +100,21 @@ class Tanh(Module):
         return self.grad_wrt_input
 
     def gradient_step(self, step_size=None):
+        """
+        Present for consistency with linear layers.
+        """
         pass
 
     def param(self):
+        """
+        :return: empty list as layer has no parameter
+        """
         return []
 
     def get_hidden_size(self):
+        """
+        :return: hidden size of the network
+        """
         return self.hidden_size
 
     def get_input_size(self):

@@ -17,14 +17,19 @@ def load_data(train=True, one_khz=False):
 def save_obj(obj, name):
     """
     Saves an object in a pickle file.
+    :param obj: Object to save.
+    :param name: Name of the file.
+    :return: Nothing.
     """
-    with open('data/pickle/' + name + '.pkl', 'wb') as f:
+    with open('../data/pickle/' + name + '.pkl', 'wb') as f:
         pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
 
 
 def load_obj(name):
     """
     Loads an object from a pickle file.
+    :param name: File name.
+    :return: Loaded object.
     """
-    with open('data/pickle/' + name + '.pkl', 'rb') as f:
+    with open('../data/pickle/' + name + '.pkl', 'rb') as f:
         return pickle.load(f)

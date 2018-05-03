@@ -11,6 +11,7 @@ from bci_dataset import BCIDataSet
 from torchvision import transforms
 
 from preprocessing import Normalize
+from preprocessing import Standardize
 from data_augmentation import GaussianNoise
 from data_augmentation import Crop1d
 
@@ -18,10 +19,18 @@ from data_augmentation import Crop1d
 class NNModel(MLModel, nn.Module):
 
     def update_data(self, data=None, targets=None, feature_augmentation=None):
+        """
+        Update the data set used to train the model.
+        :param data: Raw data (transformations are made automatically).
+        :param targets: Labels of the data.
+        :param feature_augmentation: A feature augmentation function that may be applied to the data set.
+        :return: Nothing.
+        """
         MLModel.update_data(self, data, targets, feature_augmentation)
 
         if data is not None:
-            self.normalizer = Normalize(torch.min(self.data), torch.max(self.data))
+            # self.normalizer = Normalize(torch.min(self.data), torch.max(self.data))
+            self.normalizer = Standardize(torch.mean(self.data), torch.std(self.data))
             self.train_transform = transforms.Compose([  # Crop1d(50),
                                                        GaussianNoise(0, 2),
                                                        self.normalizer])
@@ -30,6 +39,12 @@ class NNModel(MLModel, nn.Module):
             self.data_set = BCIDataSet(self.data, targets, transform=self.train_transform)
 
     def __init__(self, data=None, targets=None, feature_augmentation=None):
+        """
+        Initializer.
+        :param data: Raw data set.
+        :param targets: Labels of the data.
+        :param feature_augmentation: Feature augmentation function applied to the data.
+        """
         MLModel.__init__(self)
         nn.Module.__init__(self)
         self.normalizer = None
@@ -39,10 +54,29 @@ class NNModel(MLModel, nn.Module):
         self.update_data(data=data, targets=targets, feature_augmentation=feature_augmentation)
 
     def forward(self, x):
+        """
+        This method has to be overridden by the sub classes of NNModel.
+        :param x: Data point.
+        :return: The output of the model.
+        """
         return
 
     def fit(self, data=None, targets=None, validation_data=None, validation_targets=None, epochs=30, batch_size=128,
             optimizer='adam', lr=0.01, momentum=0):
+        """
+        Method used to fit the model to some data and targets.
+        :param data: Raw data set.
+        :param targets: Labels of the data.
+        :param validation_data: Raw validation data.
+        :param validation_targets: Labels of validation data.
+        :param epochs: Number of epochs to train the model.
+        :param batch_size: Size of the batches
+        :param optimizer: Optimizer used : can be either Adam or SGD.
+        :param lr: Learning rate for the optimizer.
+        :param momentum: Momentum for the SGD optimizer (if used).
+        :return: An history of the loss and accuracy (and validation loss and accuracy if some validation
+        data is given).
+        """
         self.train()
 
         if isinstance(data, torch.utils.data.dataset.Dataset):
@@ -110,6 +144,12 @@ class NNModel(MLModel, nn.Module):
         return history
 
     def predict(self, data, raw=False):
+        """
+        Method used to predict new data labels.
+        :param data: Raw data.
+        :param raw: Boolean specifying if the output should be one-hot encoded. Default : False.
+        :return: Predicted labels.
+        """
         self.eval()
         # data = data.view(data.shape[0], 1, -1)
         data = self.test_transform(data)
@@ -119,6 +159,12 @@ class NNModel(MLModel, nn.Module):
         return outputs
 
     def compute_accuracy(self, x_test, y_test):
+        """
+        Compute the accuracy of the model for some new data and new labels given.
+        :param x_test: Raw data.
+        :param y_test: Labels.
+        :return: The accuracy of the model.
+        """
         y_hat = self.predict(x_test).numpy()
         y_test = y_test.numpy()
         return np.sum(y_test == y_hat)/np.size(y_test)

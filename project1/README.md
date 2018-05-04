@@ -15,7 +15,15 @@ Team members :
 ### Requirements
 
 ### Organization of the folder
-
+* data : contains the data used for the project.
+    * pickle : folder containing the pickle files that were saved in order not to recompute them.
+    * labels_data_set_iv.txt : labels for the test data set.
+    * sp1s_aa_test.txt : 100Hz frequency testing data set.
+    * sp1s_aa_test_1000Hz.txt : 1000Hz frequency testing data set.
+    * sp1s_aa_train.txt : 100Hz frequency training data set and labels.
+    * sp1s_aa_train_1000Hz.txt : 1000Hz frequency training data set and labels.
+* doc : documentation of the project.
+    * miniproject-1.pdf : subject
 * src : source code of the project.
     * mlmodel.py : base class for baseline and neural network models.
     * baseline_model.py : class defining a baseline model (logistic, svm, random forest, or hidden markov).

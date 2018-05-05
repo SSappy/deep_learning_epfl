@@ -35,3 +35,4 @@ Team members :
     * bci_dataset.py : class containing the data set for nn models, helping the training with handy methods.
     * dlc_bci.py : helper functions to load the data set (the higher level functions in loading.py should be used instead).
     * conv_models.py : contains the convolutional neural network models used in this project.
+    * visualization.py : contains helper functions to plot results.

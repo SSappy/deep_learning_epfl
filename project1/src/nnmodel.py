@@ -18,27 +18,49 @@ from data_augmentation import Crop1d
 
 class NNModel(MLModel, nn.Module):
 
-    def update_data(self, data=None, targets=None, feature_augmentation=None):
+    def update_data(self, data=None, targets=None, feature_augmentation=None, standardize=False,
+                    normalize=False, noise=None, crop=None):
         """
         Update the data set used to train the model.
         :param data: Raw data (transformations are made automatically).
         :param targets: Labels of the data.
         :param feature_augmentation: A feature augmentation function that may be applied to the data set.
+        :param standardize: If True standardize the data.
+        :param normalize: If True normalize the data.
+        :param noise: Add a gaussian noise of mean 0 and std noise if not None.
+        :param crop: Crop a random window in the data of size crop if not None.
         :return: Nothing.
         """
         MLModel.update_data(self, data, targets, feature_augmentation)
 
         if data is not None:
-            # self.normalizer = Normalize(torch.min(self.data), torch.max(self.data))
-            self.normalizer = Standardize(torch.mean(self.data), torch.std(self.data))
-            self.train_transform = transforms.Compose([  # Crop1d(50),
-                                                       GaussianNoise(0, 2),
-                                                       self.normalizer])
-            self.test_transform = transforms.Compose([  # Crop1d,
-                                                      self.normalizer])
+            self.train_transform = []
+            self.test_transform = []
+
+            if crop:
+                self.train_transform.append(Crop1d(crop))
+                self.test_transform.append(Crop1d(crop))
+
+            if noise is not None:
+                self.train_transform.append(GaussianNoise(0, noise))
+
+            if standardize:
+                self.normalizer = Standardize(torch.mean(self.data), torch.std(self.data))
+            elif normalize:
+                self.normalizer = Normalize(torch.min(self.data), torch.max(self.data))
+            else:
+                self.normalizer = None
+
+            if self.normalizer is not None:
+                self.train_transform.append(self.normalizer)
+                self.test_transform.append(self.normalizer)
+
+            self.train_transform = transforms.Compose(self.train_transform)
+            self.test_transform = transforms.Compose(self.test_transform)
+
             self.data_set = BCIDataSet(self.data, targets, transform=self.train_transform)
 
-    def __init__(self, data=None, targets=None, feature_augmentation=None):
+    def __init__(self, data=None, targets=None, feature_augmentation=None, **kwargs):
         """
         Initializer.
         :param data: Raw data set.
@@ -51,7 +73,7 @@ class NNModel(MLModel, nn.Module):
         self.train_transform = None
         self.test_transform = None
         self.data_set = None
-        self.update_data(data=data, targets=targets, feature_augmentation=feature_augmentation)
+        self.update_data(data=data, targets=targets, feature_augmentation=feature_augmentation, **kwargs)
 
     def forward(self, x):
         """
@@ -61,8 +83,8 @@ class NNModel(MLModel, nn.Module):
         """
         return
 
-    def fit(self, data=None, targets=None, validation_data=None, validation_targets=None, epochs=30, batch_size=128,
-            optimizer='adam', lr=0.01, momentum=0):
+    def fit(self, data=None, targets=None, validation_data=None, validation_targets=None, epochs=30, batch_size=16,
+            optimizer='adam', lr=0.01, momentum=0, **kwargs):
         """
         Method used to fit the model to some data and targets.
         :param data: Raw data set.
@@ -83,7 +105,7 @@ class NNModel(MLModel, nn.Module):
             data_loader = torch.utils.data.DataLoader(data, batch_size=batch_size,
                                                       shuffle=True, num_workers=2)
         else:
-            self.update_data(data=data, targets=targets)
+            self.update_data(data=data, targets=targets, **kwargs)
             data_loader = torch.utils.data.DataLoader(self.data_set, batch_size=batch_size,
                                                       shuffle=True, num_workers=2)
 
@@ -104,9 +126,7 @@ class NNModel(MLModel, nn.Module):
         try:
             for epoch in range(epochs):  # loop over the data set multiple times
                 running_loss = 0.0
-                xxx = 0
                 for i, batch in enumerate(data_loader):
-                    xxx = xxx + 1
                     # get the inputs
                     inputs, labels = batch
 
@@ -121,9 +141,6 @@ class NNModel(MLModel, nn.Module):
                     optimizer.step()
 
                     running_loss += loss.item()
-                test = 0
-                # for i, x in enumerate(data):
-                test += criterion(self(data[0:1]), targets[0:1]).item()
                 running_loss = running_loss/len(data_loader)
                 accuracy = self.compute_accuracy(data, targets)
                 history['loss'].append(running_loss)

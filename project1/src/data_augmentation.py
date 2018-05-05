@@ -45,5 +45,11 @@ class Crop1d(object):
         :param data: Data to transform.
         :return: Cropped data.
         """
-        begin = randint(0, data.shape[1] - self.size)
-        return data[:, begin:(begin + self.size)]
+        if not self.size:
+            return data
+
+        begin = randint(0, data.shape[-1] - self.size)
+        if len(data.shape) == 2:
+            return data[:, begin:(begin + self.size)]
+        else:
+            return data[:, :, begin:(begin + self.size)]

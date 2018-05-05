@@ -13,6 +13,11 @@ def compute_accuracy(y, y_hat):
     return np.sum(y == y_hat)/np.size(y)
 
 
+def early_stopping(history):
+    arg_min = np.argmin(history['val_loss'])
+    return history['loss'][arg_min], history['val_loss'][arg_min], history['acc'][arg_min], history['val_acc'][arg_min]
+
+
 def cross_validation(model_builder, x_train, y_train, num_folds=5, **kwargs):
     """
     Applies cross validation to evaluate a model's performances.

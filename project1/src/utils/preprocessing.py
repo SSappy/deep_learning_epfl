@@ -32,13 +32,11 @@ class Standardize(object):
     Data pre-processing class to standardize data so the values have a fixed mean and standard deviation.
     """
 
-    def __init__(self, mean, std, new_mean=0, new_std=1):
+    def __init__(self, mean, std):
         """
         Initializer.
         :param mean: Mean of the un-standardized data.
         :param std: Std of the un-standardized data.
-        :param new_mean: Mean of the new data.
-        :param new_std: Std of the new data.
         """
         self.mean = mean
         self.std = std
@@ -52,3 +50,4 @@ class Standardize(object):
         data = (data - self.mean)/self.std
 
         return data
+

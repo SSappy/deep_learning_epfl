@@ -14,6 +14,11 @@ def compute_accuracy(y, y_hat):
 
 
 def early_stopping(history):
+    """
+    TODO fill in the docstring
+    :param history:
+    :return:
+    """
     arg_min = np.argmin(history['val_loss'])
     return history['loss'][arg_min], history['val_loss'][arg_min], history['acc'][arg_min], history['val_acc'][arg_min]
 

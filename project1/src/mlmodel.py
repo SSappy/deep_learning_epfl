@@ -1,4 +1,4 @@
-from feature_augmentation import augment_features
+from utils.feature_augmentation import augment_features
 
 
 class MLModel(object):
@@ -12,7 +12,6 @@ class MLModel(object):
         :param data: Raw data.
         :param targets: Labels of the data.
         :param feature_augmentation: Feature augmentation function applied to the data.
-        :return: Nothing.
         """
         if targets is not None:
             self.targets = targets

@@ -6,14 +6,14 @@ from torch import optim
 
 from mlmodel import MLModel
 
-from bci_dataset import BCIDataSet
+from utils.bci_dataset import BCIDataSet
 
 from torchvision import transforms
 
-from preprocessing import Normalize
-from preprocessing import Standardize
-from data_augmentation import GaussianNoise
-from data_augmentation import Crop1d
+from utils.preprocessing import Normalize
+from utils.preprocessing import Standardize
+from utils.data_augmentation import GaussianNoise
+from utils.data_augmentation import Crop1d
 
 
 class NNModel(MLModel, nn.Module):

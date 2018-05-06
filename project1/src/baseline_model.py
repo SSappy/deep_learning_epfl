@@ -5,18 +5,24 @@ from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 
 from sklearn import preprocessing
-
 from sklearn.pipeline import Pipeline
 
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import GridSearchCV
 
-from feature_augmentation import augment_features
+from utils.feature_augmentation import augment_features
 
 from mlmodel import MLModel
 
 
 class BaselineModel(MLModel):
+
+    def __init__(self, model='logistic', data=None, targets=None, feature_augmentation=None, **kwargs):
+        MLModel.__init__(self)
+        self.model = self.set_model(model)
+        self.scaler = preprocessing.StandardScaler()
+        self.update_data(data=data, targets=targets, feature_augmentation=feature_augmentation)
+        self.set_params(**kwargs)
 
     def set_params(self, **kwargs):
         self.model.set_params(**kwargs)
@@ -52,13 +58,6 @@ class BaselineModel(MLModel):
             if scale:
                 self.scaler.fit(self.data)
                 # self.data = self.scaler.transform(self.data)
-
-    def __init__(self, model='logistic', data=None, targets=None, feature_augmentation=None, **kwargs):
-        MLModel.__init__(self)
-        self.model = self.set_model(model)
-        self.scaler = preprocessing.StandardScaler()
-        self.update_data(data=data, targets=targets, feature_augmentation=feature_augmentation)
-        self.set_params(**kwargs)
 
     def fit(self, data=None, targets=None, feature_augmentation=None):
         self.update_data(data=data, targets=targets, feature_augmentation=feature_augmentation)

@@ -1,6 +1,6 @@
 import pickle
 
-import dlc_bci as bci
+from utils import dlc_bci as bci
 
 
 def load_data(train=True, one_khz=False):

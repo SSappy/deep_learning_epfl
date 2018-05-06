@@ -4,6 +4,11 @@ import matplotlib.pyplot as plt
 
 
 def plot_history(history):
+    """
+    TODO fill in the docstring
+    :param history:
+    :return:
+    """
     fig, ax = plt.subplots(1, 2, figsize=(15, 6))
 
     epochs = np.arange(len(history['loss']))

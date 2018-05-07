@@ -19,7 +19,7 @@ This python script builds a model with three hidden fully connected layers (25 h
 This model is trained to classify points in [0, 1]^2 depending on their distance to the central point (see `report.pdf` for more details).
 
 ### Requirements: 
-The mini framework was developed and tested under Python 3.5.3 on Debian Stretch using Torch 0.3.1. It has not been tested on 0.4.0 and this new version has known incompatibilities so it might not compile. On earlier versions than 0.3.1 (including 0.3.1.post2), performances may defer.
+The mini framework was developed and tested under Python 3.5.3 on Debian Stretch using Torch 0.3.1. It has not been tested on 0.4.0 and this new version has known incompatibilities so it might not compile.
 
 ### Organization of the folder:
 * doc : documentation of the project including 

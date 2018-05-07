@@ -16,7 +16,7 @@ For a demonstration of the mini framework please run
 
 This python script builds a model with three hidden fully connected layers (25 hidden units each) and ReLU, ReLU, Tanh activation layers. 
 
-This model is trained to classify points in [0, 1]^2 depending on their distance to the central point (see `report.pdf` for more details).
+This model is trained to classify points in $[0, 1]^2$ depending on their distance to the central point (see `report.pdf` for more details).
 
 ### Requirements: 
 The mini framework was developed and tested under Python 3.5.3 on Debian Stretch using Torch 0.3.1. It was tested on torch 0.4.0 but there are some issues. If you are running torch 0.4.0, we recommend that you downgrade before using.

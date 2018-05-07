@@ -22,6 +22,8 @@ Team members :
     * nnmodel.py : class defining a neural network model.
     * conv_models.py : contains the convolutional neural network models used in this project.
 
+    * notebooks : folder containing jupyter notebook files with the approach that we followed
+
     * utils : folder containing utility classes
         * loading.py : functions to load the data-set and save objects.
         * cross_validation.py : functions to do cross validation to select models.

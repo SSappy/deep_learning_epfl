@@ -5,9 +5,9 @@ import matplotlib.pyplot as plt
 
 def plot_history(history):
     """
-    TODO fill in the docstring
-    :param history:
-    :return:
+    Plots a training history.
+    :param history: Training history returned by the fit function.
+    :return: Nothing.
     """
     fig, ax = plt.subplots(1, 2, figsize=(15, 6))
 

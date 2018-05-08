@@ -157,9 +157,8 @@ class NNModel(MLModel, nn.Module):
                 if validation_data is not None and validation_targets is not None:
                     val_acc = self.compute_accuracy(validation_data, validation_targets)
                     history['val_acc'].append(val_acc)
-                    criterion2 = nn.CrossEntropyLoss()
-                    val_loss = criterion2(self.predict(validation_data, raw=True), validation_targets).item()
 
+                    val_loss = criterion(self.predict(validation_data, raw=True), validation_targets).item()
                     val_loss = val_loss  # /validation_data.shape[0]
                     history['val_loss'].append(val_loss)
 
@@ -176,7 +175,6 @@ class NNModel(MLModel, nn.Module):
         :return: Predicted labels.
         """
         self.eval()
-        # data = data.view(data.shape[0], 1, -1)
         data = self.test_transform(data)
         outputs = self(data)
         if not raw:

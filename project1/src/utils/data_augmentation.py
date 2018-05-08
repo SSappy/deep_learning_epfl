@@ -2,6 +2,7 @@ import torch
 
 from numpy.random import randint
 
+
 class GaussianNoise(object):
     """
     Data augmentation class to add a gaussian noise to the data.

@@ -84,7 +84,7 @@ class NNModel(MLModel, nn.Module):
         return
 
     def fit(self, data=None, targets=None, validation_data=None, validation_targets=None, epochs=30, batch_size=16,
-            optimizer='adam', lr=0.01, momentum=0, **kwargs):
+            optimizer='adam', lr=0.01, momentum=0, init_hidden=None, **kwargs):
         """
         Method used to fit the model to some data and targets.
         :param data: Raw data set.
@@ -96,6 +96,7 @@ class NNModel(MLModel, nn.Module):
         :param optimizer: Optimizer used : can be either Adam or SGD.
         :param lr: Learning rate for the optimizer.
         :param momentum: Momentum for the SGD optimizer (if used).
+        :param init_hidden:
         :return: An history of the loss and accuracy (and validation loss and accuracy if some validation
         data is given).
         """
@@ -117,6 +118,10 @@ class NNModel(MLModel, nn.Module):
         else:
             raise ValueError('The argument "optimizer" is invalid')
 
+        if init_hidden is not None:
+            init_hidden = getattr(self, init_hidden)
+            init_hidden()
+
         history = dict(loss=[], acc=[], val_loss=[], val_acc=[])
 
         criterion = nn.CrossEntropyLoss()
@@ -127,6 +132,9 @@ class NNModel(MLModel, nn.Module):
             for epoch in range(epochs):  # loop over the data set multiple times
                 running_loss = 0.0
                 for i, batch in enumerate(data_loader):
+                    if init_hidden is not None:
+                        init_hidden()
+
                     # get the inputs
                     inputs, labels = batch
 
@@ -149,9 +157,8 @@ class NNModel(MLModel, nn.Module):
                 if validation_data is not None and validation_targets is not None:
                     val_acc = self.compute_accuracy(validation_data, validation_targets)
                     history['val_acc'].append(val_acc)
-                    criterion2 = nn.CrossEntropyLoss()
-                    val_loss = criterion2(self.predict(validation_data, raw=True), validation_targets).item()
 
+                    val_loss = criterion(self.predict(validation_data, raw=True), validation_targets).item()
                     val_loss = val_loss  # /validation_data.shape[0]
                     history['val_loss'].append(val_loss)
 
@@ -168,7 +175,6 @@ class NNModel(MLModel, nn.Module):
         :return: Predicted labels.
         """
         self.eval()
-        # data = data.view(data.shape[0], 1, -1)
         data = self.test_transform(data)
         outputs = self(data)
         if not raw:

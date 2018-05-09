@@ -15,10 +15,10 @@ class BasicLSTM(NNModel):
 
         # The LSTM takes word embeddings as inputs, and outputs hidden states
         # with dimensionality hidden_dim.
-        self.lstm = nn.LSTM(input_size=input_size, hidden_size=hidden_size, num_layers=2, batch_first=True)
+        self.lstm = nn.LSTM(input_size=input_size, hidden_size=hidden_size, num_layers=1, batch_first=True)
 
         # The linear layer that maps from hidden state space to tag space
-        self.hidden2tag = nn.Linear(hidden_size, 2)
+        self.fc = nn.Linear(hidden_size, 2)
         self.hidden = self.init_hidden()
 
     def init_hidden(self):
@@ -26,16 +26,16 @@ class BasicLSTM(NNModel):
         # Refer to the Pytorch documentation to see exactly
         # why they have this dimensionality.
         # The axes semantics are (num_layers, minibatch_size, hidden_dim)
-        return (torch.zeros(2, 16, self.hidden_size),
-                torch.zeros(2, 16, self.hidden_size))
+        return (torch.zeros(1, 16, self.hidden_size),
+                torch.zeros(1, 16, self.hidden_size))
 
     def forward(self, x):
         print('x ', x.shape)
-        lstm_out, self.hidden = self.lstm(x, self.hidden)
-        print('lstm out ', lstm_out.shape)
-        tag_space = self.hidden2tag(x.view(len(x), -1))
-        tag_scores = F.log_softmax(tag_space, dim=1)
-        return tag_scores
+        x, self.hidden = self.lstm(x, self.hidden)
+        print('lstm out ', x.shape)
+        x = self.fc(x.view(len(x), -1))
+        x = F.softmax(x, dim=0)
+        return x
 
 
 class RNN(NNModel):

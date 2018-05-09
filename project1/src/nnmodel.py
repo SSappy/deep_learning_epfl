@@ -37,6 +37,7 @@ class NNModel(MLModel, nn.Module):
             self.train_transform = []
             self.test_transform = []
 
+            self.crop = crop
             if crop:
                 self.train_transform.append(Crop1d(crop))
                 self.test_transform.append(Crop1d(crop))
@@ -69,6 +70,7 @@ class NNModel(MLModel, nn.Module):
         """
         MLModel.__init__(self)
         nn.Module.__init__(self)
+        self.crop = None
         self.normalizer = None
         self.train_transform = None
         self.test_transform = None
@@ -167,7 +169,7 @@ class NNModel(MLModel, nn.Module):
             print('Interrupted at epoch {}.'.format(epoch))
         return history
 
-    def predict(self, data, raw=False):
+    def predict(self, data, poll=11, raw=False):
         """
         Method used to predict new data labels.
         :param data: Raw data.
@@ -175,11 +177,17 @@ class NNModel(MLModel, nn.Module):
         :return: Predicted labels.
         """
         self.eval()
-        data = self.test_transform(data)
-        outputs = self(data)
-        if not raw:
-            _, outputs = torch.max(outputs.data, dim=1)
-        return outputs
+
+        if self.crop:
+            transformed_data = self.test_transform(data)
+            outputs = self(transformed_data)
+            torch.cat((first_tensor, second_tensor), 0)
+        else:
+            data = self.test_transform(data)
+            outputs = self(data)
+            if not raw:
+                _, outputs = torch.max(outputs.data, dim=1)
+            return outputs
 
     def compute_accuracy(self, x_test, y_test):
         """

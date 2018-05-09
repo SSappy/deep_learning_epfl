@@ -50,4 +50,3 @@ class Standardize(object):
         data = (data - self.mean)/self.std
 
         return data
-

@@ -53,3 +53,22 @@ class Crop1d(object):
             return data[:, begin:(begin + self.size)]
         else:
             return data[:, :, begin:(begin + self.size)]
+
+
+def downsample(data, targets, size=50, regular=True, count=10):
+    length = data.shape[2]
+    step = length//size
+    downsampled_data = torch.Tensor()
+    downsampled_targets = torch.LongTensor()
+    if regular:
+        for start in range(step):
+            indexes = range(start, length, step)
+            downsampled_data = torch.cat((downsampled_data, data[:, :, indexes]), 0)
+            downsampled_targets = torch.cat((downsampled_targets, targets), 0)
+    else:
+        for _ in range(count):
+            ks = [randint(step) for _ in range(size)]
+            indexes = [k + i for k, i in zip(ks, list(range(0, length, step)))]
+            downsampled_data = torch.cat((downsampled_data, data[:, :, indexes]), 0)
+            downsampled_targets = torch.cat((downsampled_targets, targets), 0)
+    return downsampled_data, downsampled_targets

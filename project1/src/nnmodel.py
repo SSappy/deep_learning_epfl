@@ -10,6 +10,8 @@ from utils.bci_dataset import BCIDataSet
 
 from torchvision import transforms
 
+from sklearn.model_selection import train_test_split
+
 from utils.preprocessing import Normalize
 from utils.preprocessing import Standardize
 from utils.data_augmentation import GaussianNoise
@@ -86,7 +88,7 @@ class NNModel(MLModel, nn.Module):
         return
 
     def fit(self, data=None, targets=None, validation_data=None, validation_targets=None, epochs=30, batch_size=16,
-            optimizer='adam', lr=0.01, momentum=0, init_hidden=None, **kwargs):
+            optimizer='adam', lr=0.01, lr_decay=(0, 0), momentum=0, init_hidden=None, **kwargs):
         """
         Method used to fit the model to some data and targets.
         :param data: Raw data set.
@@ -97,12 +99,22 @@ class NNModel(MLModel, nn.Module):
         :param batch_size: Size of the batches
         :param optimizer: Optimizer used : can be either Adam or SGD.
         :param lr: Learning rate for the optimizer.
+        :param lr_decay: Tuple (step, gamma). If step is not null, multiply the learning rate by gamma every step
+        epochs.
         :param momentum: Momentum for the SGD optimizer (if used).
         :param init_hidden:
         :return: An history of the loss and accuracy (and validation loss and accuracy if some validation
         data is given).
         """
         self.train()
+
+        if isinstance(validation_data, float):
+            perm = torch.randperm(data.shape[0])
+            val_size = int(validation_data*data.shape[0])
+            validation_data = data[perm[:val_size]]
+            data = data[perm[val_size:]]
+            validation_targets = targets[perm[:val_size]]
+            targets = targets[perm[val_size:]]
 
         if isinstance(data, torch.utils.data.dataset.Dataset):
             data_loader = torch.utils.data.DataLoader(data, batch_size=batch_size,
@@ -119,6 +131,8 @@ class NNModel(MLModel, nn.Module):
             optimizer = optim.SGD(self.parameters(), lr=lr, momentum=momentum)
         else:
             raise ValueError('The argument "optimizer" is invalid')
+
+        step_decay, gamma = lr_decay
 
         if init_hidden is not None:
             init_hidden = getattr(self, init_hidden)
@@ -165,6 +179,11 @@ class NNModel(MLModel, nn.Module):
                     history['val_loss'].append(val_loss)
 
                 self.train()
+
+                if step_decay != 0 and epoch != 0 and epoch%step_decay == 0:
+                    lr = gamma*lr
+                    for param_group in optimizer.param_groups:
+                        param_group['lr'] = lr
         except KeyboardInterrupt:
             print('Interrupted at epoch {}.'.format(epoch))
         return history
@@ -173,21 +192,38 @@ class NNModel(MLModel, nn.Module):
         """
         Method used to predict new data labels.
         :param data: Raw data.
+        :param poll: In case the data is cropped, number of times it is cropped and predicted for the fina label poll.
         :param raw: Boolean specifying if the output should be one-hot encoded. Default : False.
         :return: Predicted labels.
         """
         self.eval()
 
         if self.crop:
-            transformed_data = self.test_transform(data)
-            outputs = self(transformed_data)
-            torch.cat((first_tensor, second_tensor), 0)
+            outputs = torch.Tensor()
+            for _ in range(poll):
+                transformed_data = self.test_transform(data)
+                if raw:
+                    if _ == 0:
+                        outputs = self(transformed_data)
+                    else:
+                        outputs = outputs + self(transformed_data)
+                else:
+                    _, labels = torch.max(self(transformed_data), dim=1)
+                    labels = labels.view(-1, 1)
+                    outputs = torch.cat((outputs, labels.float()), 1)
+
+            if raw:
+                outputs = outputs/11
+            else:
+                outputs = outputs.mean(dim=1)
+                outputs = outputs > 0.5
+                outputs = outputs.long()
         else:
             data = self.test_transform(data)
             outputs = self(data)
             if not raw:
                 _, outputs = torch.max(outputs.data, dim=1)
-            return outputs
+        return outputs
 
     def compute_accuracy(self, x_test, y_test):
         """

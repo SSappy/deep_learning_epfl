@@ -52,7 +52,10 @@ def cross_validation(model_builder, x_train, y_train, num_folds=5, raw=False, hi
         else:
             arg_min = np.argmin(history_['val_loss'])
             acc.append(history_['val_acc'][arg_min])
-    if raw:
-        return acc
+    if raw or history:
+        if len(acc) == 1:
+            return acc[0]
+        else:
+            return acc
     else:
         return np.mean(acc), np.std(acc)

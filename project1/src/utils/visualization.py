@@ -1,3 +1,8 @@
+"""
+File containing the helper function plot_history to visualize the learning curves.
+"""
+
+
 import numpy as np
 
 import matplotlib.pyplot as plt

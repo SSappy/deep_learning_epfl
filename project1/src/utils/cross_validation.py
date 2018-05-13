@@ -1,3 +1,10 @@
+"""
+This file contains several helper functions related to cross validation :
+- compute_accuracy
+- early_stopping
+- cross_validation
+"""
+
 import numpy as np
 
 from sklearn.model_selection import KFold

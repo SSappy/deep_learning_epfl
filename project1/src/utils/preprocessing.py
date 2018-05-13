@@ -1,3 +1,8 @@
+"""
+File defining the classes Normalize and Standardize used respectively to normalize and standardize the data set.
+"""
+
+
 class Normalize(object):
     """
     Data pre-processing class to normalize data so the values are in the range [new_min, new_max].

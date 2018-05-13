@@ -1,3 +1,8 @@
+"""
+This file defines the class BCIDataSet inheriting torch.utils.data.dataset.DataSet. It is a container
+the data set used for the training in nnmodel.py.
+"""
+
 from torch.utils.data.dataset import Dataset
 
 

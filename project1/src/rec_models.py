@@ -1,3 +1,9 @@
+"""
+File defining the recurrent neural network models that we trained. They all inherit the class NNModel defined in
+nnmodel.py.
+"""
+
+
 import torch
 import torch.nn as nn
 from torch.nn import functional as F

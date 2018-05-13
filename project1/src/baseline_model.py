@@ -1,3 +1,9 @@
+"""
+File defining the class BaselineModel inheriting the class MLModel. It is used to create and train baseline models
+such as logistic regressions, support vector machines and random forests.
+"""
+
+
 import numpy as np
 
 from sklearn.linear_model import LogisticRegression

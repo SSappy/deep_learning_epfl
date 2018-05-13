@@ -1,3 +1,10 @@
+"""
+This file contains several classes and functions related to data augmentation  :
+- class GaussianNoise
+- class Crop1d
+- function downsample
+"""
+
 import torch
 
 from numpy.random import randint
@@ -65,10 +72,14 @@ def downsample(data, targets, size=50, regular=True, count=10):
             indexes = range(start, length, step)
             downsampled_data = torch.cat((downsampled_data, data[:, :, indexes]), 0)
             downsampled_targets = torch.cat((downsampled_targets, targets), 0)
+
+            if start >= count - 1:
+                break
     else:
         for _ in range(count):
             ks = [randint(step) for _ in range(size)]
             indexes = [k + i for k, i in zip(ks, list(range(0, length, step)))]
             downsampled_data = torch.cat((downsampled_data, data[:, :, indexes]), 0)
             downsampled_targets = torch.cat((downsampled_targets, targets), 0)
+
     return downsampled_data, downsampled_targets

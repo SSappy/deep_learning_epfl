@@ -1,3 +1,8 @@
+"""
+File defining the class MLModel. It is the base class for all the machine learning models trained in this project.
+"""
+
+
 from utils.feature_augmentation import augment_features
 
 

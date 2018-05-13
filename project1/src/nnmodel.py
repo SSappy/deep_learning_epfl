@@ -1,3 +1,8 @@
+"""
+File defining the class NNModel, inheriting the class MLModel. It is the base class for all neural network models.
+"""
+
+
 import numpy as np
 
 import torch
@@ -9,8 +14,6 @@ from mlmodel import MLModel
 from utils.bci_dataset import BCIDataSet
 
 from torchvision import transforms
-
-from sklearn.model_selection import train_test_split
 
 from utils.preprocessing import Normalize
 from utils.preprocessing import Standardize

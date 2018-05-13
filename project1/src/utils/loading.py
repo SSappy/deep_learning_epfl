@@ -1,3 +1,10 @@
+"""
+File containing helper functions to load the data set and to save/load any kind of object :
+- function load_data
+- function save_obj
+- function load_obj
+"""
+
 import pickle
 
 from utils import dlc_bci as bci
@@ -29,7 +36,7 @@ def load_obj(name):
     """
     Loads an object from a pickle file.
     :param name: File name.
-    :return: Loaded object.
+    :return: The loaded object.
     """
     with open('../data/pickle/' + name + '.pkl', 'rb') as f:
         return pickle.load(f)

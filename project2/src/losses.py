@@ -26,4 +26,4 @@ class MSE:
         :return:
         """
         assert predictions.shape == targets.shape
-        return 2/predictions.shape[0] * (predictions - targets)
+        return (predictions - targets).mean(0)

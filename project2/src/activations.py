@@ -26,12 +26,13 @@ class ReLU(Module):
         self.output[input_tensor < 0] = 0
         return self.output
 
-    def backward(self, grad_wrt_output, step_size=None):
+    def backward(self, grad_wrt_output, step_size=None, momentum=None):
         """
         Backward pass.
         :param grad_wrt_output: tensor of shape (self.size) which is the gradient with respect
         to the output of the current layer
         :param step_size: None but need it for consistency with other layers.
+        :param momentum: None but need it for consistency with other layers.
         :return: gradient with respect to input : tensor of shape (self.size) which is the element-wise product of
         gradient of ReLU and grad_wrt_output.
         """
@@ -86,12 +87,13 @@ class Tanh(Module):
         self.output = input_tensor.apply_(tanh)
         return self.output
 
-    def backward(self, grad_wrt_output, step_size=None):
+    def backward(self, grad_wrt_output, step_size=None, momentum=None):
         """
         Backward pass.
         :param grad_wrt_output: tensor of shape (self.size) which is the gradient with respect
         to the output of the current layer
         :param step_size: None but need it for consistency with other layers.
+        :param momentum: None but need it for consistency with other layers.
         :return: gradient with respect to input : tensor of shape (self.size) which is the element-wise product of
         gradient of tanh and grad_wrt_output.
         """

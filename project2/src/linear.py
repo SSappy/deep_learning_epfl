@@ -19,8 +19,8 @@ class Linear(Module):
         self.weights = FloatTensor(hidden_units, input_size).uniform_(-1, 1)
         self.biases = FloatTensor(hidden_units).uniform_(-1, 1)
 
-        self.weights_gradients = FloatTensor(hidden_units, input_size)
-        self.biases_gradients = FloatTensor(hidden_units)
+        self.weights_gradients = [FloatTensor(hidden_units, input_size).zero_()]
+        self.biases_gradients = [FloatTensor(hidden_units).zero_()]
 
 
     def forward(self, input_tensor):
@@ -33,19 +33,27 @@ class Linear(Module):
         self.output = self.weights @ input_tensor + self.biases
         return self.output
 
-    def backward(self, grad_wrt_output):
+    def backward(self, grad_wrt_output, momentum=None):
         """
         Backward pass (computation of all the gradients)
         Gradients are computed using the gradient with respect to the output of the layer
         :param grad_wrt_output: gradient with respect to the output
+        :param momentum: if not None, Momentum SGD is used with the value passed
         :return: gradient with respect to the input (to be passed up the network)
         """
         # computing gradient with respect to input
         grad_wrt_input = self.weights.transpose(0, 1) @ grad_wrt_output
 
         # Compute the derivatives of the loss wrt the parameters
-        self.biases_gradients = grad_wrt_output
-        self.weights_gradients = grad_wrt_output.view(-1, 1) @ self.input.view(1, -1)
+        biases_gradients = grad_wrt_output
+        weights_gradients = grad_wrt_output.view(-1, 1) @ self.input.view(1, -1)
+
+        if momentum is None:
+            self.biases_gradients.append(biases_gradients)
+            self.weights_gradients.append(weights_gradients)
+        else:
+            self.biases_gradients.append(momentum * self.biases_gradients[-1] + (1-momentum) * biases_gradients)
+            self.weights_gradients.append(momentum * self.weights_gradients[-1] + (1-momentum) * weights_gradients)
 
         return grad_wrt_input
 
@@ -55,8 +63,8 @@ class Linear(Module):
         :param step_size: step size of the updates
         """
         # updating weights and biases
-        self.weights -= step_size * self.weights_gradients
-        self.biases -= step_size * self.biases_gradients
+        self.weights -= step_size * self.weights_gradients[-1]
+        self.biases -= step_size * self.biases_gradients[-1]
 
     def param(self):
         """

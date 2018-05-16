@@ -4,6 +4,7 @@ from torch import cat
 from collections import defaultdict
 from random import shuffle
 
+
 class Sequential:
     def __init__(self, loss, input_size):
         """
@@ -123,7 +124,6 @@ class Sequential:
             val_accuracy = (val_predictions == y_validation).sum() / y_validation.shape[1] / val_predictions.shape[0]
             history['val_loss'].append(val_loss.mean())
             history['val_acc'].append(val_accuracy)
-
             print('Loss at epoch {} : {}'.format(epoch, tr_loss.mean()))
 
         # Print final training performance

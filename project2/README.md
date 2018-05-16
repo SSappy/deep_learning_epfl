@@ -12,7 +12,7 @@ Team members :
 
 ### Usage:
 For a demonstration of the mini framework please run 
-`$ python3 run.py` in a python3 environment with torch 0.3.1 installed.
+`$ python3 test.py` in a python3 environment with torch 0.3.1 installed.
 
 This python script builds a model with three hidden fully connected layers (25 hidden units each) and ReLU, ReLU, Tanh activation layers. 
 

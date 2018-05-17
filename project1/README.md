@@ -11,9 +11,10 @@ Team members :
 - Shengzhao Lei
 
 ### Usage
+For a demonstration of the mini project please run `$ python3 test.py` in a python3 environment with torch 0.4.0 installed. It takes an optional argument `train` (default False) : if it's True it will create a new model and train it, otherwise it will load the weights of a pre-trained model.
 
 ### Requirements
-
+The mini framework was developed and tested on Ubuntu 18.04 under Python 3.6.5 and using PyTorch 0.4.0.
 
 ### Organization of the folder
 * src : source code of the project.
@@ -21,8 +22,12 @@ Team members :
     * baseline_model.py : class defining a baseline model (logistic, svm, random forest, or hidden markov).
     * nnmodel.py : class defining a neural network model.
     * conv_models.py : contains the convolutional neural network models used in this project.
+    * rec_models.py : contains the definition of the recurrent models.
 
-    * notebooks : folder containing jupyter notebook files with the approach that we followed
+    * notebooks : folder containing jupyter notebook files with the approach that we followed.
+        * Baseline models.ipynb : training of the baseline models.
+        * Convolutional networks.ipynb : exploration and training of the CNNs.
+        * Recurrent neural networks.ipynb : training of the recurrent models.
 
     * utils : folder containing utility classes
         * loading.py : functions to load the data-set and save objects.
@@ -32,6 +37,7 @@ Team members :
         * bci_dataset.py : class containing the data set for nn models, helping the training with handy methods.
         * dlc_bci.py : helper functions to load the data set (the higher level functions in loading.py should be used instead).
         * visualization.py : helper functions to plot results.
+        * preprocessing.py : defines two classes for standardization and normalization.
 * doc : documentation of the project.
     * miniproject-1.pdf : subject
 * data : contains the data used for the project.

@@ -91,7 +91,7 @@ class NNModel(MLModel, nn.Module):
         return
 
     def fit(self, data=None, targets=None, validation_data=None, validation_targets=None, epochs=30, batch_size=16,
-            optimizer='adam', lr=0.01, lr_decay=(0, 0), momentum=0, init_hidden=None, **kwargs):
+            optimizer='adam', lr=0.01, lr_decay=(0, 0), momentum=0, **kwargs):
         """
         Method used to fit the model to some data and targets.
         :param data: Raw data set.
@@ -105,7 +105,6 @@ class NNModel(MLModel, nn.Module):
         :param lr_decay: Tuple (step, gamma). If step is not null, multiply the learning rate by gamma every step
         epochs.
         :param momentum: Momentum for the SGD optimizer (if used).
-        :param init_hidden:
         :return: An history of the loss and accuracy (and validation loss and accuracy if some validation
         data is given).
         """
@@ -137,10 +136,6 @@ class NNModel(MLModel, nn.Module):
 
         step_decay, gamma = lr_decay
 
-        if init_hidden is not None:
-            init_hidden = getattr(self, init_hidden)
-            init_hidden()
-
         history = dict(loss=[], acc=[], val_loss=[], val_acc=[])
 
         criterion = nn.CrossEntropyLoss()
@@ -151,9 +146,6 @@ class NNModel(MLModel, nn.Module):
             for epoch in range(epochs):  # loop over the data set multiple times
                 running_loss = 0.0
                 for i, batch in enumerate(data_loader):
-                    if init_hidden is not None:
-                        init_hidden()
-
                     # get the inputs
                     inputs, labels = batch
 

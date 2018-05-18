@@ -118,3 +118,22 @@ class ConvNet3(NNModel):
         # x = self.drop(x)
         x = self.fc2(x)
         return x
+
+
+class ConvNet2d(NNModel):
+
+    def __init__(self, dropout=0.5):
+        super(ConvNet2d, self).__init__()
+        num_hidden = 32
+        self.length = 25
+        self.conv1 = nn.Conv2d(1, 16, kernel_size=5, padding=2)
+        self.drop = nn.Dropout(dropout)
+        self.fc1 = nn.Linear(self.length*16*14, num_hidden)
+        self.fc2 = nn.Linear(num_hidden, 2)
+
+    def forward(self, x):
+        x = x.unsqueeze(1)
+        x = F.relu(F.max_pool2d(self.drop(self.conv1(x)), kernel_size=2))
+        x = F.relu(self.fc1(x.view(-1, self.length*16*14)))
+        x = self.fc2(x)
+        return x

@@ -11,7 +11,7 @@ Team members :
 - Shengzhao Lei
 
 ### Usage
-For a demonstration of the mini project please run `$ python3 test.py` in a python3 environment with torch 0.4.0 installed. It takes an optional argument `train` (default False) : if it's True it will create a new model and train it, otherwise it will load the weights of a pre-trained model.
+For a demonstration of the mini project please run `$ python3 test.py` in a python3 environment with torch 0.4.0 installed. It will create our best model and train it, and finally evaluate its accuracy on the test set.
 
 ### Requirements
 The mini framework was developed and tested on Ubuntu 18.04 under Python 3.6.5 and using PyTorch 0.4.0.
